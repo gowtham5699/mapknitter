@@ -16,12 +16,12 @@ deploy-container:
 
 redeploy-container:
 	docker-compose down --remove-orphans
-	docker volume rm -f mapknitter_yarn_cache mapknitter_bundle_cache
 	docker-compose up --force-recreate -d
-	docker exec -it -e DISABLE_DATABASE_ENVIRONMENT_CHECK=1mapknitter bash -lc\
-												"bundle exec rails db:reset && \
-												 bundle exec rails db:migrate"
 	while ! docker logs mapknitter | grep "web server started"; do\
 		echo "Serving Mapknitter";\
 		sleep 10;\
 	done;
+	docker exec mapknitter bash -lc "gem install faker -v '~> 1.9.3'"
+	docker exec -e DISABLE_DATABASE_ENVIRONMENT_CHECK=1 mapknitter bash -lc \
+												"bundle exec rails db:reset && \
+												 bundle exec rails db:migrate"
